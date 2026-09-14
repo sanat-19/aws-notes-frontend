@@ -2,6 +2,8 @@
 
 Part of the AWS/Docker/Kubernetes learning project — see `aws-notes-backend/CLAUDE.md` for the full project plan, phase roadmap, and working-style rules (those still apply here: Docker/CI files stay user-authored, application code is written normally).
 
+**Review before push** (as of 2026-09-15): edit files as normal, but do not run `git add`/`commit`/`push`. The user reviews the diff and pushes themselves once satisfied. Applies across all three repos in this project.
+
 ## Why this repo exists ahead of Phase 7
 
 The original plan sequenced the frontend as Phase 7, after the backend is fully deployed to AWS. It was pulled forward (2026-09-15) because the user wanted to see the backend working visually rather than only via curl, and understood the "never localhost" rule correctly: the frontend always points at whichever backend is "real" for the moment — `http://localhost:8080` now, the AWS-deployed URL once Phase 3/4 land — via a build-time env var, never hardcoded. The user has no frontend background and explicitly delegated all frontend decisions.
