@@ -32,7 +32,7 @@ src/
 
 ## Backend integration notes
 
-- CORS: the backend's `FRONTEND_URL` env var must match this app's origin (`http://localhost:5173` in dev) or requests are blocked. See `aws-notes-backend`'s `api/cors.go` and `appconfig`.
+- CORS: the backend's `FRONTEND_URL` env var must match this app's origin exactly (scheme+host+port) or the browser blocks responses. Local backend defaults to `http://localhost:5173`; the **AWS-deployed backend's task definition sets `http://localhost:3000`**, so when `VITE_API_URL` points at the ECS task, run `npm run dev -- --port 3000` (if 3000 is taken Vite silently falls back to 3001 and CORS fails). The task's public IP changes every deploy, so update `VITE_API_URL` and restart Vite (env is read at startup) until an ALB exists (Phase 7). See `aws-notes-backend`'s `api/cors.go` and `appconfig`.
 - Auth: JWT in `Authorization: Bearer <token>` header, not cookies — no CSRF concerns, no `credentials: include` needed.
 - File downloads (`api.downloadAttachment`) fetch as a blob with the auth header attached, then trigger a browser download via an object URL — a plain `<a href>` can't carry the Authorization header, so this can't be a simple link.
 - **Permission-aware rendering**: `GET /api/notes/shared-with-me` returns a `permission: "read"|"write"` field per note (absent on the user's own notes, which are always fully editable). `NoteEditor` derives `isOwner`/`canEdit` from this and conditionally hides Save/Delete/tag-editing/attachment-upload/Share controls for read-only shares. This was added after testing surfaced a real gap: without it, the UI offered edit controls that the backend would then reject with 403. If extending sharing further, keep this field flowing through - don't let the UI drift back to "assume owner."
@@ -43,6 +43,6 @@ All core flows built and verified in a real browser against the real backend + l
 
 Known gaps / not yet done:
 - No automated tests
-- Attachment upload never verified through an actual browser file picker (only via backend curl tests)
+- ~~Attachment upload never verified through an actual browser file picker~~ — verified 2026-09-24 by the user in a real browser against the AWS-deployed backend, with files landing in S3 and surviving a redeploy
 - `docker-compose.yml` (Phase 2, bringing backend + frontend + Postgres together) not yet written — stays the user's file per the working-style rule
 - No production build / deploy config yet (Phase 7.1)
